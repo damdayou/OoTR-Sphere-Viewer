@@ -4,6 +4,7 @@ export class Graph {
     constructor(parent) {
         this.parent = parent;
         this.nodes = {};
+        this.selection = new Set();
 
         // Implement drag'n drop
         this.parent.addEventListener("dragover", (event) => {
@@ -24,6 +25,16 @@ export class Graph {
         })
     }
 
+    toggleSelection(nodeId) {
+        if(this.selection.has(nodeId)) {
+            this.selection.delete(nodeId);
+            this.nodes[nodeId].element.classList.remove("selected");
+        } else {
+            this.selection.add(nodeId);
+            this.nodes[nodeId].element.classList.add("selected");
+        }
+    }
+
     addNode(name, x, y) {
         let node = new Node(name);
         this.nodes[node.id] = node;
@@ -32,9 +43,22 @@ export class Graph {
         node.setPosition(x, y);
         node.setDraggable("move");
 
+
+        // Listeners
+        node.element.addEventListener("click", (event) => {
+            console.log("Click on node #" + node.id);
+            this.toggleSelection(node.id);
+        })
+
         node.element.addEventListener("contextmenu", (event) => {
             event.preventDefault();
-            this.deleteNode(node.id);
+            if(this.selection.has(node.id)) {
+                this.selection.forEach((node2) => {
+                    this.deleteNode(node2);
+                });
+            } else {
+                this.deleteNode(node.id);
+            }
             return false;
         })
     }
@@ -51,6 +75,7 @@ export class Graph {
         }
 
         node.element.parentElement.removeChild(node.element);
+        this.selection.delete(node.id);
         delete this.nodes[node.id];
     }
 }

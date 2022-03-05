@@ -55,3 +55,8 @@ export class Node {
     }
 
 }
+
+Node.connect = function(parent, child) {
+    parent.children.add(child.id);
+    child.parents.add(parent.id);
+}

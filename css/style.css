@@ -44,3 +44,8 @@ body {
     display: block;
     position: fixed;
 }
+
+#graph-view .node.selected {
+    border: 2px solid #d3d02f;
+    transform: translate(-2px, -2px);
+}
