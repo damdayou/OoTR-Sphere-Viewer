@@ -1,0 +1,41 @@
+body {
+    background: #222222;
+    min-width: 400px;
+}
+
+#app {
+    display: flex;
+    justify-content: space-between;
+}
+
+.category {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 3px;
+
+    max-width: 180px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    background-color: #000000;
+    border: 1px solid #888888;
+}
+
+.subcategory {
+    white-space: nowrap;
+}
+
+.subcategory img {
+    margin: 1px;
+    width: 28px;
+}
+
+
+#graph-view {
+    flex-grow: 1;
+    margin: 5px;
+
+    background-color: #000000;
+    border: 1px solid #888888;
+}
