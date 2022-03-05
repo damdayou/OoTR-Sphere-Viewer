@@ -8,6 +8,11 @@ body {
     justify-content: space-between;
 }
 
+.node {
+    margin: 1px;
+    width: 28px;
+}
+
 .category {
     margin-top: 5px;
     margin-bottom: 5px;
@@ -26,16 +31,16 @@ body {
     white-space: nowrap;
 }
 
-.subcategory img {
-    margin: 1px;
-    width: 28px;
-}
-
-
 #graph-view {
+    position: relative;
     flex-grow: 1;
     margin: 5px;
 
     background-color: #000000;
     border: 1px solid #888888;
+}
+
+#graph-view .node {
+    display: block;
+    position: fixed;
 }
