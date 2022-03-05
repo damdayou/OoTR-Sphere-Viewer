@@ -46,7 +46,6 @@ export class Graph {
 
         // Listeners
         node.element.addEventListener("click", (event) => {
-            console.log("Click on node #" + node.id);
             this.toggleSelection(node.id);
         })
 
