@@ -14,15 +14,16 @@ export class Node {
 
         this.element = document.createElement("img");
         this.element.setAttribute("src", "./img/nodes/" + item_name + "_32x32.png");
+        this.element.setAttribute("data-id", this.id);
         this.element.classList.add("node");
     }
 
     setPosition(x, y) {
-        this.position.x = x;
-        this.position.y = y;
-
         let w = this.element.clientWidth;
         let h = this.element.clientHeight;
+
+        this.position.x = x;
+        this.position.y = y;
 
         this.element.style.left = (x - 0.5 * w) + "px";
         this.element.style.top = (y - 0.5 * h) + "px";
@@ -41,22 +42,34 @@ export class Node {
 
         if(type == "new") {
             this.element.addEventListener("dragstart", event => {
+                event.dataTransfer.setData("text/plain", "");
                 event.dataTransfer.setData("type", "new");
                 event.dataTransfer.setData("name", this.item_name);
-                event.dataTransfer.dropEffect = "copy";
             });
         } else if(type == "move") {
             this.element.addEventListener("dragstart", event => {
+                event.dataTransfer.setData("text/plain", "");
                 event.dataTransfer.setData("type", "move");
                 event.dataTransfer.setData("id", this.id);
-                event.dataTransfer.dropEffect = "move";
             });
         }
     }
 
 }
 
-Node.connect = function(parent, child) {
-    parent.children.add(child.id);
-    child.parents.add(parent.id);
+
+Node.toggleConnection = function(parent, child) {
+    if(parent.children.has(child.id) && child.parents.has(parent.id)) {
+        parent.children.delete(child.id);
+        child.parents.delete(parent.id);
+        return false;
+    }
+
+    if(!parent.children.has(child.id) && !child.parents.has(parent.id)) {
+        parent.children.add(child.id);
+        child.parents.add(parent.id);
+        return true;
+    }
+
+    console.log("Warning: asymetric connection detected between nodes #" + parent.id + " and #" + child.id);
 }

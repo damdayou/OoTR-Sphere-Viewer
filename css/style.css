@@ -42,7 +42,7 @@ body {
 
 #graph-view .node {
     display: block;
-    position: fixed;
+    position: absolute;
 }
 
 #graph-view .node.selected {
