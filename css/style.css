@@ -1,11 +1,22 @@
+html, body {
+    padding: 0px;
+    margin: 0px;
+}
+
 body {
     background: #222222;
     min-width: 400px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #app {
     display: flex;
+    flex-grow: 1;
     justify-content: space-between;
+    padding: 4px;
+    margin: 0px;
 }
 
 .node {
@@ -14,7 +25,7 @@ body {
 }
 
 .category {
-    margin-top: 5px;
+    margin-top: 0px;
     margin-bottom: 5px;
     padding: 3px;
 
@@ -34,7 +45,8 @@ body {
 #graph-view {
     position: relative;
     flex-grow: 1;
-    margin: 5px;
+    margin: 0px;
+    margin-left: 5px;
 
     background-color: #000000;
     border: 1px solid #888888;

@@ -5,7 +5,7 @@ export class Graph {
         this.parent = parent;
         this.nodes = {};
         this.selection = new Set();
-        this.sphereHeight = 36;
+        this.sphereHeight = 42;
         this.timestamp = undefined;
 
         this.canvas = document.createElement("canvas");
