@@ -5,7 +5,7 @@ export class Graph {
         this.parent = parent;
         this.nodes = {};
         this.selection = new Set();
-        this.sphereHeight = 32;
+        this.sphereHeight = 36;
         this.timestamp = undefined;
 
         this.canvas = document.createElement("canvas");
@@ -209,13 +209,14 @@ export class Graph {
                 if(id == id2 || Node.areConnected(node, node2))
                     continue;
 
-                let {x: x2, y: y2} = node2.position;
-                let dist = Math.sqrt((x2 - x) ** 2 + (y2 - y) ** 2);
-                if(dist < 1.33 * this.sphereHeight) {
-                    let angle = Math.atan2(y2 - y, x2 - x);
-                    let dx = dist * Math.cos(angle);
-                    node.addForce(-dx, 0);
-                    node2.addForce(dx, 0);
+                if(node.sphere != node2.sphere)
+                    continue;
+
+                let dx = node2.position.x - node.position.x;
+                if(Math.abs(dx) < 1.33 * this.sphereHeight) {
+                    let fx = 300 / dx;
+                    node.addForce(-fx, 0);
+                    node2.addForce(fx, 0);
                 }
             }
         }
