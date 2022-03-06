@@ -11,6 +11,8 @@ export class Node {
         this.parents = new Set();
         this.children = new Set();
         this.position = {x: undefined, y: undefined};
+        this.sphere = undefined;
+        this.force = {x: 0, y: 0};
 
         this.element = document.createElement("img");
         this.element.setAttribute("src", "./img/nodes/" + item_name + "_32x32.png");
@@ -19,12 +21,11 @@ export class Node {
     }
 
     setPosition(x, y) {
-        let w = this.element.clientWidth;
-        let h = this.element.clientHeight;
-
         this.position.x = x;
         this.position.y = y;
 
+        let w = this.element.clientWidth;
+        let h = this.element.clientHeight;
         this.element.style.left = (x - 0.5 * w) + "px";
         this.element.style.top = (y - 0.5 * h) + "px";
     }
@@ -55,8 +56,27 @@ export class Node {
         }
     }
 
+    addForce(x, y) {
+        this.force.x += x;
+        this.force.y += y;
+    }
+
+    applyForces(dt, limits) {
+        let x = this.position.x + dt * this.force.x;
+        if(x < limits.xmin) { x = limits.xmin; }
+        if(x > limits.xmax) { x = limits.xmax; }
+        let y = this.position.y + dt * this.force.y;
+        this.setPosition(x, y);
+
+        this.force.x = 0;
+        this.force.y = 0;
+    }
+
 }
 
+Node.areConnected = function(nodeA, nodeB) {
+    return (nodeA.children.has(nodeB.id) || nodeA.parents.has(nodeA.id));
+}
 
 Node.toggleConnection = function(parent, child) {
     if(parent.children.has(child.id) && child.parents.has(parent.id)) {

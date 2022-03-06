@@ -2,18 +2,17 @@ import {Categories} from "./js/Categories.js"
 import {Node} from "./js/Node.js"
 import {Graph} from "./js/Graph.js"
 
-let pool_area = document.querySelector("#node-pool");
-let graph_area = document.querySelector("#graph-view");
+let poolArea = document.querySelector("#node-pool");
+let graphArea = document.querySelector("#graph-view");
 
-let graph = new Graph(graph_area);
+let graph = new Graph(graphArea);
 
 // Populate pool
-let pool_nodes = [];
 for(let [name, subcategory] of Object.entries(Categories)) {
     let div = document.createElement("div");
     div.classList.add("category");
     div.setAttribute("data-name", name);
-    pool_area.appendChild(div);
+    poolArea.appendChild(div);
 
     for(let [subname, items] of Object.entries(subcategory)) {
         let subdiv = document.createElement("div");
@@ -24,8 +23,11 @@ for(let [name, subcategory] of Object.entries(Categories)) {
         for(let item of items) {
             let node = new Node(item);
             subdiv.appendChild(node.element);
-            pool_nodes.push(node);
             node.setDraggable("new");
         }
     }
 }
+
+window.addEventListener("load", (event) => {
+    graph.redraw();
+})

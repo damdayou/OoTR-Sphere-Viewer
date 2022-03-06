@@ -5,12 +5,14 @@ export class Graph {
         this.parent = parent;
         this.nodes = {};
         this.selection = new Set();
+        this.sphereHeight = 32;
+        this.timestamp = undefined;
 
         this.canvas = document.createElement("canvas");
         this.context = this.canvas.getContext("2d");
         this.resizeCanvas();
         this.parent.appendChild(this.canvas);
-        window.addEventListener("resize", (event) => { this.resizeCanvas(); });
+        window.addEventListener("resize", (event) => { this.redraw(); });
 
         // Implement drag'n drop
         this.parent.addEventListener("dragover", (event) => {
@@ -36,6 +38,9 @@ export class Graph {
                     let id = event.dataTransfer.getData("id");
                     let node = this.nodes[id];
                     node.setPosition(x, y)
+
+                    let sphere = Math.floor(y / this.sphereHeight);
+                    node.sphere = parseInt(sphere);
                 }
             } else if(event.target.classList.contains("node")) {
                 if(type == "move") {
@@ -45,7 +50,9 @@ export class Graph {
                 }
             }
 
+            // Draw and animate
             this.redraw();
+            window.requestAnimationFrame(this.update.bind(this));
         })
 
         this.parent.addEventListener("click", (event) => {
@@ -73,6 +80,9 @@ export class Graph {
     addNode(name, x, y) {
         let node = new Node(name);
         this.nodes[node.id] = node;
+
+        let sphere = Math.floor(y / this.sphereHeight);
+        node.sphere = parseInt(sphere);
 
         this.parent.appendChild(node.element);
         node.setPosition(x, y);
@@ -133,13 +143,23 @@ export class Graph {
 
 
     resizeCanvas() {
-        this.canvas.setAttribute("width", this.parent.clientWidth - 4);
-        this.canvas.setAttribute("height", this.parent.clientHeight - 4);
+        this.canvas.setAttribute("width", 0);
+        this.canvas.setAttribute("height", 0);
+        this.canvas.setAttribute("width", this.parent.clientWidth - 2);
+        this.canvas.setAttribute("height", this.parent.clientHeight - 2);
     }
 
 
     redraw() {
         this.resizeCanvas();
+        const { width, height } = this.canvas.getBoundingClientRect();
+
+        this.context.fillStyle = "#0f0f0f";
+        let y = 0;
+        while(y < height) {
+            this.context.fillRect(0, y, width, this.sphereHeight);
+            y += 2 * this.sphereHeight;
+        }
 
         this.context.lineWidth = 2;
         this.context.strokeStyle = "white";
@@ -155,5 +175,65 @@ export class Graph {
             }
         }
         this.context.stroke();
+    }
+
+    update(timestamp) {
+        let redraw = false;
+        
+        if(this.timestamp == undefined) {
+            this.timestamp = timestamp;
+            window.requestAnimationFrame(this.update.bind(this));
+            return;
+        }
+        let ms = timestamp - this.timestamp;
+        this.timestamp += ms;
+
+        // Compute forces
+        for(let id in this.nodes) {
+            let node = this.nodes[id];
+            let [x, y] = [node.position.x, node.position.y];
+
+            // Attract to sphere
+            if(node.sphere != undefined) {
+                let sphereY = this.sphereHeight * (node.sphere + 0.5);
+                let dy = sphereY - y;
+                if(Math.abs(dy) > 1e-5) {
+                    node.addForce(0, 5 * dy);
+                    redraw = true;
+                }
+            }
+
+            // Repulse
+            for(let id2 in this.nodes) {
+                let node2 = this.nodes[id2];
+                if(id == id2 || Node.areConnected(node, node2))
+                    continue;
+
+                let {x: x2, y: y2} = node2.position;
+                let dist = Math.sqrt((x2 - x) ** 2 + (y2 - y) ** 2);
+                if(dist < 1.33 * this.sphereHeight) {
+                    let angle = Math.atan2(y2 - y, x2 - x);
+                    let dx = dist * Math.cos(angle);
+                    node.addForce(-dx, 0);
+                    node2.addForce(dx, 0);
+                }
+            }
+        }
+
+        // Apply forces
+        let dt = ms / 1000;
+        if(dt > 1) {dt = 1};
+        
+        let limits = {
+            xmin: 14, xmax: this.canvas.clientWidth - 14
+        }
+        for(let id in this.nodes) {
+            this.nodes[id].applyForces(dt, limits);
+        }
+
+        if(true) {
+            this.redraw();
+        }
+        window.requestAnimationFrame(this.update.bind(this));
     }
 }
